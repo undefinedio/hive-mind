@@ -98,10 +98,10 @@ exports.addIdea = function (req, res) {
     };
     newIdea.save(function (err, idea, affected) {
         if (err) {
-            res.send({'error': 'An error has occurred'});
+            res.send(500,{'error': 'An error has occurred'});
         } else {
             console.log('Success: ' + JSON.stringify(idea[0]));
-            res.send(affected + " records affected");
+            res.send(200, {'succes' : affected + " records affected"});
         }
     });
 };
@@ -130,7 +130,7 @@ exports.synchronize = function (req, res) {
 
                 Idea.update({_id: idea._id}, upsertData, {upsert: true}, function (err, idea, affected) {
                     if (err) {
-                        res.send({'error': 'An error has occurred'});
+                        res.send(500,{'error': 'An error has occurred'});
                     }
                 });
             } else {
@@ -140,15 +140,15 @@ exports.synchronize = function (req, res) {
 
                 newIdea.save(function (err, idea, affected) {
                     if (err) {
-                        res.send({'error': 'An error has occurred'});
+                        res.send(500,{'error': 'An error has occurred'});
                     }
                 });
             }
 
         });
-        res.send({'succes': 'records updated and inserted'}, {'data': newIDs});
+        res.send(200, {'succes': 'records updated and inserted' , 'data': newIDs});
     } else {
-        res.send({'error': 'Not authenticated biatch!'});
+        res.send(500,{'error': 'Not authenticated biatch!'});
     }
 
 };
@@ -158,9 +158,9 @@ exports.deleteIdea = function (req, res) {
     console.log('Deleting Idea: ' + id);
     Idea.find({ _id: id  }).remove(function (err, idea, affected) {
         if (err) {
-            res.send({'error': 'An error has occurred'});
+            res.send(500,{'error': 'An error has occurred'});
         } else {
-            res.send({'succes': 'record deleted'}, 200);
+            res.send(200, {'succes': 'record deleted'});
         }
     });
 };
