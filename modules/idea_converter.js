@@ -4,15 +4,15 @@
 exports.convert = function (idea) {
 
     var created = new Date(idea.created_on);
-    var expireDate = new Date(created);
-    expireDate.setMonth(created.getMonth() + 1);
+//    var expireDate = new Date(created);
+//    expireDate.setMonth(created.getMonth() + 1);
 
     var convertedIdea = {
         device: idea.device,
         content: idea.content,
         created: created,
-        expire_date: expireDate,
-        updated: Date.now(),
+        expire_date: idea.expire_date,
+        updated: idea.updated,
         made_public: idea.made_public ? idea.made_public : false,
         synced: true,
         meta: {

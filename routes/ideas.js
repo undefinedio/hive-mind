@@ -154,10 +154,26 @@ exports.synchronize = function (req, res) {
 };
 
 exports.deleteIdea = function () {
-
+    var id = req.params.id;
+    console.log('Deleting Idea: ' + id);
+    Idea.find({ _id: id  }).remove(function (err, idea, affected) {
+        if (err) {
+            res.send({'error': 'An error has occurred'});
+        }
+    });
 };
-exports.updateIdea = function () {
+exports.makePublicIdea = function (newIdea, fn) {
+    var upsertData = newIdea.toObject();
+    // Delete the _id property, otherwise Mongo will return a "Mod on _id not allowed" error
+    delete upsertData._id;
 
+    Idea.update({_id: newIdea._id}, { $set: {made_public: true}}, function (err, idea) {
+        if (err) {
+            console.error('An error has occurred');
+        } else {
+            fn({'succes': 'update succeeded ' + idea})
+        }
+    });
 };
 
 

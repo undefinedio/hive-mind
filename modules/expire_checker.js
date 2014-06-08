@@ -7,15 +7,19 @@ this.checkdates = function () {
 
 function extracted(privateIdeas) {
     if (privateIdeas) {
-        console.log(privateIdeas.length +  " private ideas found");
+        var now = moment();
+        console.log(privateIdeas.length + " private ideas found");
         privateIdeas.forEach(function (idea, key) {
-            var createdMoment = moment(idea.created);
-            var now = moment();
-            var diff = now.diff(createdMoment);
-            if (diff < 0) {
-                console.log("diff < 0, so this is expired and to be made public" , diff);
-            } else{
-                console.log("diff > 0, so not expired", diff)
+            var expiresOn = moment(idea.expire_date);
+            var diff = now.diff(expiresOn);
+            console.log(idea.content + "\n Today :   " + now.format("DD/MM/YYYY")+"\n expires : " + expiresOn.format("DD/MM/YYYY"));
+            if (diff > 0) {
+                console.log(" diff > 0, so this is expired and to be made public", diff);
+                ideas.makePublicIdea(idea, function (data) {
+                    console.log(data.succes);
+                });
+            } else {
+                console.log(" diff < 0, so not expired", diff);
             }
         });
     } else {

@@ -22,7 +22,6 @@ app.post('/ideas/synchronize/:id', ideas.synchronize);
 
 app.post('/ideas/idea', ideas.addIdea);
 
-app.put('/ideas/idea/:id', ideas.updateIdea);
 app.delete('/ideas/idea/:id', ideas.deleteIdea);
 
 app.listen(3000);
