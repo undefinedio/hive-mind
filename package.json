@@ -1,0 +1,9 @@
+{
+    "name": "hive-mind",
+    "description": "the backend for the hive application",
+    "version": "0.0.1",
+    "dependencies": {
+        "express": "~4.4.1",
+        "mongoose" : "~3.8.12"
+    }
+}
