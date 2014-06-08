@@ -22,9 +22,11 @@ app.post('/ideas/synchronize/:id', ideas.synchronize);
 
 app.post('/ideas/idea', ideas.addIdea);
 
-app.delete('/ideas/idea/:id', ideas.deleteIdea);
+app.delete('/ideas/delete/:id', ideas.deleteIdea);
 
-app.listen(3000);
+
+var port = Number(process.env.PORT || 5000);
+app.listen(port);
 
 expireChecker.startCheckerJobInterval();
 

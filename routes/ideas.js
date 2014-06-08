@@ -20,7 +20,7 @@ var IdeaSchema = mongoose.Schema({
 var Idea = mongoose.model('Idea', IdeaSchema);
 
 
-mongoose.connect('localhost/hive');
+mongoose.connect('mongodb://hive:hivefive@kahana.mongohq.com:10044/app26160980');
 db = mongoose.connection;
 
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -153,12 +153,14 @@ exports.synchronize = function (req, res) {
 
 };
 
-exports.deleteIdea = function () {
+exports.deleteIdea = function (req, res) {
     var id = req.params.id;
     console.log('Deleting Idea: ' + id);
     Idea.find({ _id: id  }).remove(function (err, idea, affected) {
         if (err) {
             res.send({'error': 'An error has occurred'});
+        } else {
+            res.send({'succes': 'record deleted'}, 200);
         }
     });
 };
