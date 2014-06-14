@@ -2,8 +2,6 @@
 logs
 *.log
 
-secret.js
-
 # Runtime data
 pids
 *.pid

@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var secret = require('../config/secret');
-var mongodbURL = 'mongodb://hive:hivefive@kahana.mongohq.com:10044/app26160980';
+var mongodbURL = 'mongodb://'+secret.mongouser+':' + secret.mongopassword + '@kahana.mongohq.com:10044/app26160980';
 var mongodbOptions = { };
 
 mongoose.connect(mongodbURL, mongodbOptions, function (err, res) {
