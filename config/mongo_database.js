@@ -9,7 +9,7 @@ if (process.env.MONGOHQ_USER == "" || process.env.MONGOHQ_USER == undefined) {
     mongocloudUser = secret.mongouser;
     cloudPublicpassword = secret.publicpassword;
 } else {
-    mongocloudPassword = process.env.MONGOHQ_PASW;
+    mongocloudPassword = process.env.MONGOHQ_PASSW;
     mongocloudUser = process.env.MONGOHQ_USER;
     cloudPublicpassword = process.env.PUBLIC_PASSWORD;
 }
