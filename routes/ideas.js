@@ -119,7 +119,7 @@ exports.synchronize = function (req, res) {
 
             console.log("Adding Ideas", idea.content);
 
-            var newIdea = new Idea(ideaConverter.convert(idea));
+            var newIdea = new db.ideaModel(ideaConverter.convert(idea));
 
             if (!idea.new) {
 
@@ -129,7 +129,7 @@ exports.synchronize = function (req, res) {
                 // Delete the _id property, otherwise Mongo will return a "Mod on _id not allowed" error
                 delete upsertData._id;
 
-                Idea.update({_id: idea._id}, upsertData, {upsert: true}, function (err, idea, affected) {
+                db.ideaModel.update({_id: idea._id}, upsertData, {upsert: true}, function (err, idea, affected) {
                     if (err) {
                         res.send(500,{'error': 'An error has occurred'});
                     }
@@ -139,7 +139,7 @@ exports.synchronize = function (req, res) {
 
                 newIDs.push({"frontID": idea._id, "mongoID": newIdea._id});
 
-                newIdea.save(function (err, idea, affected) {
+                db.ideaModel.save(function (err, idea, affected) {
                     if (err) {
                         res.send(500,{'error': 'An error has occurred'});
                     }
