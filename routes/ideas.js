@@ -47,17 +47,40 @@ exports.findAllPublic = function(req, res) {
 
 exports.findAllForDevice = function (req, res) {
     var device = req.params.deviceID;
-    db.ideaModel.find({device: device}, function (err, ideas) {
-        if (err) return console.error(err);
-        res.json(ideas);
+    var query = db.ideaModel.find({device: device});
+
+    query.select(publicFields);
+    query.sort('created');
+    query.exec(function(err, results) {
+        if (err) {
+            console.log(err);
+            return res.send(400);
+        }
+
+        for (var postKey in results) {
+            results[postKey].content = results[postKey].content.substr(0, 400);
+        }
+        return res.json(200, results);
     });
 };
 
 exports.findById = function (req, res) {
     var id = req.params.id;
-    db.ideaModel.findOne({_id: id}, function (err, idea) {
-        if (err) return console.error(err);
-        res.send(idea);
+    var query = db.ideaModel.find({_id: id});
+
+    query.select(publicFields);
+    query.sort('created');
+    query.exec(function(err, results) {
+        if (err) {
+            console.log(err);
+            return res.send(400);
+        }
+
+        for (var postKey in results) {
+            results[postKey].content = results[postKey].content.substr(0, 400);
+        }
+
+        return res.json(200, results);
     });
 };
 
