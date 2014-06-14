@@ -1,6 +1,17 @@
 var db = require('../config/mongo_database');
 var jwt = require('jsonwebtoken');
-var secret = require('../config/secret');
+var cloudSecrettoken, cloudPublicpassword;
+
+if (process.env.SECRET_TOKEN != "" || process.env.SECRET_TOKEN != undefined) {
+    var secret = require('../config/secret');
+    cloudSecrettoken = secret.secretToken;
+    cloudPublicpassword = secret.publicpassword;
+} else {
+    cloudSecrettoken = process.env.SECRET_TOKEN;
+    cloudPublicpassword = process.env.PUBLIC_PASSWORD;
+}
+
+
 var redisClient = require('../config/redis_database').redisClient;
 var tokenManager = require('../config/token_manager');
 
@@ -28,7 +39,7 @@ exports.signin = function (req, res) {
                 return res.send(401);
             }
 
-            var token = jwt.sign({id: user._id}, secret.secretToken, { expiresInMinutes: tokenManager.TOKEN_EXPIRATION });
+            var token = jwt.sign({id: user._id}, cloudSecrettoken, { expiresInMinutes: tokenManager.TOKEN_EXPIRATION });
 
             return res.json({token: token});
         });
@@ -53,7 +64,7 @@ exports.register = function (req, res) {
     var password = password;
     var passwordConfirmation = req.body.passwordConfirmation || '';
 
-    if (deviceID == '' || password == '' || password != passwordConfirmation || password != secret.publicpassword) {
+    if (deviceID == '' || password == '' || password != passwordConfirmation || password != cloudPublicpassword) {
         return res.send(400);
     }
 

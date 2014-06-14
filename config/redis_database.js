@@ -1,7 +1,15 @@
 var redis = require('redis'),
-    secret = require('../config/secret'),
     url = require('url');
-var redisURL = url.parse(process.env.REDISCLOUD_URL || "http://root:" + secret.redispassword + "@pub-redis-14380.us-east-1-4.3.ec2.garantiadata.com:14380");
+var rediscloudPassword;
+if (process.env.REDISCLOUD_PASSWORD != "" || process.env.REDISCLOUD_PASSWORD != undefined) {
+    var secret = require('../config/secret');
+    rediscloudPassword = secret.redispassword;
+} else {
+    rediscloudPassword = process.env.REDISCLOUD_PASSWORD;
+}
+
+
+var redisURL = url.parse(process.env.REDISCLOUD_URL || "http://root:" + rediscloudPassword + "@pub-redis-14380.us-east-1-4.3.ec2.garantiadata.com:14380");
 
 var redisClient = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
 redisClient.auth(redisURL.auth.split(":")[1]);

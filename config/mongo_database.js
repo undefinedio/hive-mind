@@ -1,8 +1,20 @@
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
-var secret = require('../config/secret');
-var mongodbURL = 'mongodb://'+secret.mongouser+':' + secret.mongopassword + '@kahana.mongohq.com:10044/app26160980';
+var mongocloudUser, mongocloudPassword, cloudPublicpassword;
+
+if (process.env.MONGOHQ_USER != "" || process.env.MONGOHQ_USER != undefined) {
+    var secret = require('../config/secret');
+    mongocloudPassword = secret.mongopassword;
+    mongocloudUser = secret.mongouser;
+    cloudPublicpassword = secret.publicpassword;
+} else {
+    mongocloudPassword = process.env.MONGOHQ_PASW;
+    mongocloudUser = process.env.MONGOHQ_USER;
+    cloudPublicpassword = process.env.PUBLIC_PASSWORD;
+}
+
+var mongodbURL = 'mongodb://' + mongocloudUser + ':' + mongocloudPassword + '@kahana.mongohq.com:10044/app26160980';
 var mongodbOptions = { };
 
 mongoose.connect(mongodbURL, mongodbOptions, function (err, res) {
@@ -19,7 +31,7 @@ var Schema = mongoose.Schema;
 // User schema
 var User = new Schema({
     deviceID: { type: String, required: true, unique: true },
-    password: { type: String, required: true, unique: false, default: secret.publicpassword  },
+    password: { type: String, required: true, unique: false, default: cloudPublicpassword  },
     is_admin: { type: Boolean, default: false },
     created: { type: Date, default: Date.now }
 });
