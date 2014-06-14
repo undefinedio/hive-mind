@@ -139,7 +139,7 @@ exports.synchronize = function (req, res) {
 
                 newIDs.push({"frontID": idea._id, "mongoID": newIdea._id});
 
-                db.ideaModel.save(function (err, idea, affected) {
+                newIdea.save(function (err, idea, affected) {
                     if (err) {
                         res.send(500,{'error': 'An error has occurred'});
                     }
