@@ -8,7 +8,7 @@ var express = require('express'),
 
 var cloudSecretToken;
 
-if (process.env.SECRET_TOKEN != "" || process.env.SECRET_TOKEN != undefined) {
+if (process.env.SECRET_TOKEN == "" || process.env.SECRET_TOKEN == undefined) {
     var secret = require('./config/secret');
     cloudSecretToken = secret.secretToken;
 } else {

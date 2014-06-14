@@ -1,7 +1,7 @@
 var redis = require('redis'),
     url = require('url');
 var rediscloudPassword;
-if (process.env.REDISCLOUD_PASSWORD != "" || process.env.REDISCLOUD_PASSWORD != undefined) {
+if (process.env.REDISCLOUD_PASSWORD == "" || process.env.REDISCLOUD_PASSWORD == undefined) {
     var secret = require('../config/secret');
     rediscloudPassword = secret.redispassword;
 } else {

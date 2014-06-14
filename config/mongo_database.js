@@ -3,7 +3,7 @@ var bcrypt = require('bcrypt');
 var SALT_WORK_FACTOR = 10;
 var mongocloudUser, mongocloudPassword, cloudPublicpassword;
 
-if (process.env.MONGOHQ_USER != "" || process.env.MONGOHQ_USER != undefined) {
+if (process.env.MONGOHQ_USER == "" || process.env.MONGOHQ_USER == undefined) {
     var secret = require('../config/secret');
     mongocloudPassword = secret.mongopassword;
     mongocloudUser = secret.mongouser;

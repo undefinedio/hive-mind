@@ -2,7 +2,7 @@ var db = require('../config/mongo_database');
 var jwt = require('jsonwebtoken');
 var cloudSecrettoken, cloudPublicpassword;
 
-if (process.env.SECRET_TOKEN != "" || process.env.SECRET_TOKEN != undefined) {
+if (process.env.SECRET_TOKEN == "" || process.env.SECRET_TOKEN == undefined) {
     var secret = require('../config/secret');
     cloudSecrettoken = secret.secretToken;
     cloudPublicpassword = secret.publicpassword;
