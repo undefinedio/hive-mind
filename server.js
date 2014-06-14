@@ -1,34 +1,62 @@
 var express = require('express'),
-    ideas = require('./routes/ideas'),
     cors = require('cors'),
+    jwt = require('express-jwt'),
     expireChecker = require('./modules/expire_checker'),
-    bodyParser = require('body-parser');
-
+    bodyParser = require('body-parser'),
+    morgan = require('morgan'), // logger
+    tokenManager = require('./config/token_manager'),
+    secret = require('./config/secret');
 
 var app = express();
 app.use(cors());
 app.use(bodyParser())
-
-// parse application/vnd.api+json as json
-app.use(bodyParser.json({ type: 'application/vnd.api+json' }))
-
-app.get('/ideas/device/:id', ideas.findAllForDevice);
-app.get('/ideas/idea/:id', ideas.findById);
-app.get('/ideas', ideas.findAll);
-app.get('/ideas/feed', ideas.findAllPublic);
+app.use(morgan());
 
 
-app.post('/ideas/synchronize/:id', ideas.synchronize);
+app.all('*', function(req, res, next) {
+    res.set('Access-Control-Allow-Origin', 'http://localhost');
+    res.set('Access-Control-Allow-Credentials', true);
+    res.set('Access-Control-Allow-Methods', 'GET, POST, DELETE, PUT');
+    res.set('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization');
+    if ('OPTIONS' == req.method) return res.send(200);
+    next();
+});
 
-app.post('/ideas/idea', ideas.addIdea);
+//Routes
+var routes = {};
+routes.ideas = require('./routes/ideas.js');
+routes.users = require('./routes/users.js');
 
-app.delete('/ideas/delete/:id', ideas.deleteIdea);
+
+//ALL GET ROUTES
+app.get('/ideas/device/:deviceID', jwt({secret: secret.secretToken}), tokenManager.verifyToken, routes.ideas.findAllForDevice);
+app.get('/ideas/idea/:id', routes.ideas.findById);
+app.get('/ideas', routes.ideas.findAll);
+app.get('/ideas/feed', routes.ideas.findAllPublic);
+//app.get('/ideas/feed/private', routes.ideas.findAllPrivate);
+
+//ALL POST ROUTES
+//app.post('/post', jwt({secret: secret.secretToken}), tokenManager.verifyToken , routes.posts.create);
+app.post('/ideas/synchronize/:id', jwt({secret: secret.secretToken}), tokenManager.verifyToken, routes.ideas.synchronize);
+app.post('/ideas/idea', routes.ideas.addIdea);
+
+//Create a new user/device
+app.post('/user/register', routes.users.register);
+
+//Login
+app.post('/user/signin', routes.users.signin);
 
 
-var port = Number(process.env.PORT || 5000);
+//app.post('/ideas/:id/inspire', routes.ideas.inspire);
+
+//ALL DELETE ROUTES
+app.delete('/ideas/delete/:id', jwt({secret: secret.secretToken}), tokenManager.verifyToken, routes.ideas.deleteIdea);
+
+
+var port = Number(process.env.PORT || 4000);
 app.listen(port);
 
 expireChecker.startCheckerJobInterval();
 
 
-console.log('Listening on port 3000...');
+console.log('Listening on port 4000...');

@@ -1,83 +1,61 @@
-var mongoose = require('mongoose'),
-    moment = require('moment'),
-    ideaConverter = require('../modules/idea_converter'),
-    expireChecker = require('../modules/expire_checker'),
-    db;
+var moment = require('moment'),
+    ideaConverter = require('../modules/idea_converter');
+var db = require('../config/mongo_database.js');
 
-var IdeaSchema = mongoose.Schema({
-    device: String,
-    content: String,
-    created: { type: Date, default: Date.now },
-    expire_date: { type: Date },
-    updated: Date,
-    made_public: Boolean,
-    synced: Boolean,
-    meta: {
-        ispires: Number,
-        spamvotes: Number
-    }
-});
-var Idea = mongoose.model('Idea', IdeaSchema);
-
-
-mongoose.connect('mongodb://hive:hivefive@kahana.mongohq.com:10044/app26160980');
-db = mongoose.connection;
-
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function callback() {
-    console.log("connection with mongodb is open");
-//    populateDB();
-});
-
-IdeaSchema.methods.findById = function (cb) {
-    return this.model('Idea').find({ _id: this.id }, cb);
-};
-
-IdeaSchema.methods.findAllForDevice = function (deviceId, cb) {
-    return this.model('Idea').find({});
-};
-
-IdeaSchema.methods.findAll = function (cb) {
-    return this.model('Idea').find({});
-};
-IdeaSchema.methods.findAllPrivate = function (cb) {
-    return this.model('Idea').find({'made_public': false});
-};
+var publicFields = '_id device content expire_date synced made_public meta created';
 
 
 exports.findAll = function (req, res) {
-    Idea.find(function (err, ideas) {
-        if (err) return console.error(err);
-        res.send(ideas);
-    })
-};
+    var query = db.ideaModel.find();
 
-exports.findAllPrivate = function (fn) {
-    Idea.find({made_public: false}, function (err, ideas) {
-        if (err) return console.error(err);
-//        console.log("found " + ideas);
-        fn(ideas);
+    query.select(publicFields);
+    query.sort('created');
+    query.exec(function(err, results) {
+        if (err) {
+            console.log(err);
+            return res.send(400);
+        }
+
+        for (var postKey in results) {
+            results[postKey].content = results[postKey].content.substr(0, 400);
+        }
+
+        return res.json(200, results);
     });
 };
 
-exports.findAllPublic = function (req, res) {
-    Idea.find({made_public: true}, function (err, ideas) {
-        if (err) return console.error(err);
-        res.send(ideas);
+
+exports.findAllPublic = function(req, res) {
+    var query = db.ideaModel.find({made_public: true});
+
+    query.select(publicFields);
+    query.sort('created');
+    query.exec(function(err, results) {
+        if (err) {
+            console.log(err);
+            return res.send(400);
+        }
+
+        for (var postKey in results) {
+            results[postKey].content = results[postKey].content.substr(0, 400);
+        }
+
+        return res.json(200, results);
     });
 };
+
 
 exports.findAllForDevice = function (req, res) {
-    var device = req.params.id;
-    Idea.find({device: device}, function (err, ideas) {
+    var device = req.params.deviceID;
+    db.ideaModel.find({device: device}, function (err, ideas) {
         if (err) return console.error(err);
-        res.send(ideas);
+        res.json(ideas);
     });
 };
 
 exports.findById = function (req, res) {
     var id = req.params.id;
-    Idea.findOne({_id: id}, function (err, idea) {
+    db.ideaModel.findOne({_id: id}, function (err, idea) {
         if (err) return console.error(err);
         res.send(idea);
     });
@@ -156,7 +134,7 @@ exports.synchronize = function (req, res) {
 exports.deleteIdea = function (req, res) {
     var id = req.params.id;
     console.log('Deleting Idea: ' + id);
-    Idea.find({ _id: id  }).remove(function (err, idea, affected) {
+    db.ideaModel.find({ _id: id  }).remove(function (err, idea, affected) {
         if (err) {
             res.send(500,{'error': 'An error has occurred'});
         } else {
@@ -169,7 +147,7 @@ exports.makePublicIdea = function (newIdea, fn) {
     // Delete the _id property, otherwise Mongo will return a "Mod on _id not allowed" error
     delete upsertData._id;
 
-    Idea.update({_id: newIdea._id}, { $set: {made_public: true}}, function (err, idea) {
+    db.ideaModel.update({_id: newIdea._id}, { $set: {made_public: true}}, function (err, idea) {
         if (err) {
             console.error('An error has occurred');
         } else {
@@ -178,7 +156,24 @@ exports.makePublicIdea = function (newIdea, fn) {
     });
 };
 
+//NO ROUTE, THIS IS PRIVATE FUNCTION FOR EXPIRECHECKER NO AUTHENTICATION REQUIRED BECAUSE IT RUNS ON THE MACHINE ITSELF
+exports.findAllPrivate = function (fn) {
+    var query = db.ideaModel.find({made_public: false});
 
+    query.select(publicFields);
+    query.sort('created');
+    query.exec(function(err, results) {
+        if (err) {
+            console.log(err);
+        }
+
+        for (var postKey in results) {
+            results[postKey].content = results[postKey].content.substr(0, 400);
+        }
+
+        fn(results)
+    });
+};
 var populateDB = function () {
 
     var ideas = [
@@ -224,14 +219,14 @@ var populateDB = function () {
     ];
 
 
-    ideas.forEach(function (idea, key) {
-        console.log('adding', idea);
-        var newIdea = new Idea(idea);
-        newIdea.save(function () {
-            console.log(arguments);
-        });
-
-    });
+//    ideas.forEach(function (idea, key) {
+//        console.log('adding', idea);
+//        var newIdea = new db.ideaModel(idea);
+//        newIdea.save(function () {
+//            console.log(arguments);
+//        });
+//
+//    });
 
 //    console.log(ideas);
 };
