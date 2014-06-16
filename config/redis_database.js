@@ -18,17 +18,18 @@ redisClient.on('error', function (err) {
     console.log('Error ' + err);
 });
 
-redisClient.on('connect', function () {
-    console.log('Redis is ready');
-});
-
-redisClient.set('foo', 'bar');
-redisClient.get('foo', function (err, reply) {
-    console.log(reply.toString()); // Will print `bar`
-});
-redisClient.del('foo', function (err, reply) {
-    console.log(reply.toString())
-});
+// TEST REDIS DB
+//redisClient.on('connect', function () {
+//    console.log('Redis is ready');
+//});
+//
+//redisClient.set('foo', 'bar');
+//redisClient.get('foo', function (err, reply) {
+//    console.log(reply.toString()); // Will print `bar`
+//});
+//redisClient.del('foo', function (err, reply) {
+//    console.log(reply.toString())
+//});
 
 exports.redis = redis;
 exports.redisClient = redisClient;

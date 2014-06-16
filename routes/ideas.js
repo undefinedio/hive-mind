@@ -120,10 +120,11 @@ exports.synchronize = function (req, res) {
             console.log("Adding Ideas", idea.content);
 
             var newIdea = new db.ideaModel(ideaConverter.convert(idea));
-
+            console.log("Idea is new true/false: " + idea.new);
             if (!idea.new) {
 
                 //UPSERT !!!
+                console.log("UPSERT");
 
                 var upsertData = newIdea.toObject();
                 // Delete the _id property, otherwise Mongo will return a "Mod on _id not allowed" error
@@ -132,16 +133,18 @@ exports.synchronize = function (req, res) {
                 db.ideaModel.update({_id: idea._id}, upsertData, {upsert: true}, function (err, idea, affected) {
                     if (err) {
                         res.send(500,{'error': 'An error has occurred'});
+                        return false;
                     }
                 });
             } else {
                 //NEW RECORD !!!
-
+                console.log("NEW RECORD");
                 newIDs.push({"frontID": idea._id, "mongoID": newIdea._id});
 
                 newIdea.save(function (err, idea, affected) {
                     if (err) {
                         res.send(500,{'error': 'An error has occurred'});
+                        return false;
                     }
                 });
             }
@@ -150,8 +153,8 @@ exports.synchronize = function (req, res) {
         res.send(200, {'succes': 'records updated and inserted' , 'data': newIDs});
     } else {
         res.send(500,{'error': 'Not authenticated biatch!'});
+        return false;
     }
-
 };
 
 exports.deleteIdea = function (req, res) {

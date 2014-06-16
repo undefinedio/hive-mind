@@ -17,9 +17,8 @@ if (process.env.SECRET_TOKEN == "" || process.env.SECRET_TOKEN == undefined) {
 
 var app = express();
 app.use(cors());
-app.use(bodyParser())
+app.use(bodyParser());
 app.use(morgan());
-
 
 app.all('*', function (req, res, next) {
     res.set('Access-Control-Allow-Origin', 'http://localhost');
